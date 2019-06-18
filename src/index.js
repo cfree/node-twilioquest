@@ -2,11 +2,11 @@ const express = require('express');
 const app = express();
 require('dotenv').config()
 
-const outboundReq = require('./controllers/outbound');
-const inboundReq = require('./controllers/inbound');
+const { countryHandler, timestamp, todoList } = require('./controllers');
 
-app.get('/', outboundReq);
-app.get('/sms', inboundReq);
+app.get('/', timestamp);
+// app.get('/sms', countryHandler);
+app.get('/sms', todoList);
 
 const server = app.listen(8081, function () {
   const host = server.address().address

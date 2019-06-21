@@ -15,7 +15,7 @@ module.exports.countryHandler = function countryHandler(req, res) {
   res.send(response.toString());
 };
 
-module.exports.timestamp = function timestamp(req, res) {
+module.exports.timestampHandler = function timestimestampHandlertamp(req, res) {
   const time = Date.now();
 
   return client.messages.create({
@@ -30,11 +30,10 @@ module.exports.timestamp = function timestamp(req, res) {
   .catch(console.error);
 };
 
-module.exports.todoList = function todoList(req, res) {
+module.exports.todoListHandler = function todoListHandler(req, res) {
   const response = new MessagingResponse();
   const msg = req.query.Body;
   let msgLowercase = ` ${msg}`.slice(1).toLowerCase();
-  console.log(`Lowercase: ${msgLowercase}`);
   let item;
 
   if (msgLowercase.startsWith('add')) {
@@ -43,9 +42,15 @@ module.exports.todoList = function todoList(req, res) {
     console.log(`Adding: ${item}`);
     response.message(`"${item}" has been added`);
   } else if (msgLowercase.startsWith('list')) {
-    console.log('Listing');
     if (list.length) {
-      response.message(list.map((el, index) => `${index + 1}. ${el}`).join('\n'));
+      const opts = {
+        action: `${process.env.HOST}/status`,
+        method: 'POST',
+      };
+      response.message(
+        opts,
+        list.map((el, index) => `${index + 1}. ${el}`).join('\n'),
+      );
     } else {
       response.message('Nothing to do yet');
     }
@@ -59,4 +64,13 @@ module.exports.todoList = function todoList(req, res) {
   }
 
   res.send(response.toString());
+};
+
+module.exports.deliveryStatusHandler = function deliveryStatusHandler(req, res) {
+  const status = req.body['MessageStatus'];
+  console.log('MessageSid:', status);
+  console.log('MessageSid:', req.body['MessageSid']);
+  console.log('X-Twilio-Signature:', req.headers['x-twilio-signature']);
+  console.log('-------------------------');
+  res.send(status);
 };
